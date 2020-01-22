@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build-m": "rm -rf dist_mac && electron-packager ./ --platform=darwin --out=dist_mac ",
-    "start": "electron .",
+    "start": "electron . --inspect",
     "extract:mac": "rm -rf app-asar && asar extract 'dist/mac/electron-puppeteer-quick-start.app/Contents/Resources/app.asar' app-asar",
     "build-w": "rm -rf dist_win && electron-builder --win --x64",
     "open": "open dist/mac/electron-puppeteer-quick-start.app/Contents/MacOS/electron-puppeteer-quick-start"

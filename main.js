@@ -13,16 +13,6 @@ const url = require('url');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-async function getPic(url) {
-  const browser = await puppeteer.launch({ headless: true, slowMo: 250 });
-  const page = await browser.newPage();
-  await page.goto(url);
-  await page.setViewport({ width: 1200, height: 800 });
-  await page.screenshot({ path: 'google.png' });
-
-  await browser.close();
-}
-
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 400, height: 600, webPreferences:{ nodeIntegration: true } });
