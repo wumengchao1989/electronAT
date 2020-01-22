@@ -1,16 +1,39 @@
 const puppeteer = require('puppeteer');
+const path=require('path')
 var fs = require('fs');
-var inputPath = "/Users/mwu233/test/"
-var fileName = inputPath + 'UserStoryList.txt';
-
-var document = fs.readFileSync(fileName, 'utf-8');
 var count = 0;
-const number = /^[0-9]+$/
 var filesAlreadyScanned = new Array()
 
 
-async function run(){
+function addConsoleList(document,text){
+      var elem = document.createElement("li");
+      elem.className = "list-group-item";
+      elem.innerHTML=`<span>${text}</span>`
+      document.documentElement.appendChild(elem);
+}
+
+function terminatePupeeteer(browserInstance){
+      browserInstance.close();
+}
+
+async function run(inputPath,userStoryPath,username,password,browserDocument){
+      const fileName = userStoryPath;
+      try{
+            fs.statSync(inputPath);
+            fs.statSync(userStoryPath);
+      }catch(err){
+            if(err){
+                  console.log(err)
+                  alert("No such directory,please input right path,Process stop");
+                  return 0
+            }
+      }
+      var document = fs.readFileSync(fileName, 'utf-8');
       fs.readdir(inputPath, function (err, items) {
+            if(err){
+                  addConsoleList(browserDocument,err.toString())
+                  return;
+            }
             for (var i = 0; i < items.length; i++) {
                   var temp = items[i]
                   if (temp.split('.')[1] == 'pdf') {
@@ -32,42 +55,46 @@ async function run(){
                   await page.goto('https://rally1.rallydev.com/');
                   await page.waitForSelector('#j_username')
                   await page.focus('#j_username')
-                  await page.keyboard.type('xing.x.yu1@pwc.com');
+                  await page.keyboard.type(username);
                   await page.focus('#j_password');
-                  await page.keyboard.type('Pwcwelcome1');
-                  await page.waitFor(3000);
+                  await page.keyboard.type(password);
                   try{
                         await page.click('#login-button');
                         await page.click('#login-button');
                   }catch(err){
                         console.log(err)
                   }
-                  console.log("log in success")
+         /*          await page.waitFor(3000);
+                  let loginFlag = await page.$(".slm-print-link")
+                  if (!loginFlag){
+                        addConsoleList(browserDocument, "log in failed,process stopped")
+                        await browser.close();
+                        return;
+                  } */
+                  addConsoleList(browserDocument,"log in success")
                   if (document) {
                         var userStories = eval(document)
-                        console.log("reading file")
-
+                        addConsoleList(browserDocument, "reading file")
                         for (var userStory of userStories) {
                               var storyName = await userStory.name
                               var formattedId = await userStory.formattedId;
                               var objectId = await userStory.objectID;
                               if (filesAlreadyScanned.indexOf(formattedId) != -1) {
-                                    console.log(formattedId + " has already scanned, will be skiped")
+                                    addConsoleList(browserDocument, `${formattedId} has already scanned, will be skiped`)
                                     continue
                               }
-                              console.log("start handling " + formattedId)
+                              addConsoleList(browserDocument, `start handling ${formattedId}`)
                               var tempurl = 'https://rally1.rallydev.com/slm/ar/print/printSingleDialog.sp?oid=' + objectId
                               await page.goto(tempurl)
                               await page.waitFor(3000);
                               await page.waitForSelector('input[type="submit"]')
                               await page.click('input[type="submit"]')
                               await page.waitForSelector('.slm-print-link')
-                              savingPath = inputPath + formattedId + '.pdf'
-
+                              savingPath = path.join(inputPath,`${formattedId}.pdf`)
                               await page.waitForSelector('.dt-tbl')
                               await page.waitFor(10000);
                               await page.pdf({ path: savingPath, format: 'A4' });
-                              console.log(savingPath + " has saved");
+                              addConsoleList(browserDocument, `${savingPath} has saved`)
                               await page.goto('https://rally1.rallydev.com/');
                         }
                         console.log("finished")
