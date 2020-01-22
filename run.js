@@ -26,7 +26,7 @@ async function run(){
             (async () => {
                   console.log('There are ' + filesAlreadyScanned.length + " already scanned")
                   const browser = await puppeteer.launch({
-                        headless: false
+                        headless: true
                   });
                   var page = await browser.newPage();
                   await page.goto('https://rally1.rallydev.com/');
@@ -35,9 +35,13 @@ async function run(){
                   await page.keyboard.type('xing.x.yu1@pwc.com');
                   await page.focus('#j_password');
                   await page.keyboard.type('Pwcwelcome1');
-                  await page.click('#login-button');
-
-
+                  await page.waitFor(3000);
+                  try{
+                        await page.click('#login-button');
+                        await page.click('#login-button');
+                  }catch(err){
+                        console.log(err)
+                  }
                   console.log("log in success")
                   if (document) {
                         var userStories = eval(document)
