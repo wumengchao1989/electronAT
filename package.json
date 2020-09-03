@@ -60,7 +60,7 @@
   "dependencies": {
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
-    "puppeteer": "1.6.0"
+    "puppeteer": "5.2.1"
   },
   "devDependencies": {
     "asar": "^0.14.3",
